@@ -13,17 +13,13 @@
         }
         .app-container { width: 100%; max-width: 400px; }
         
-        /* 返回按钮 */
         .back-link { 
             display: block; text-align: center; margin-bottom: 15px; 
             color: #2c3e50; text-decoration: none; font-weight: bold; 
             background: rgba(255,255,255,0.7); padding: 8px; border-radius: 20px;
         }
-
-        /* 顶部进度条 */
         .progress { color: #2c3e50; font-size: 14px; text-align: center; margin-bottom: 15px; font-weight: bold; }
-
-        /* 卡片本体 */
+        
         .card { 
             background: white; border-radius: 20px; padding: 30px 20px; 
             box-shadow: 0 10px 20px rgba(0,0,0,0.15); text-align: center; 
@@ -32,14 +28,12 @@
         .word-en { font-size: 40px; font-weight: bold; color: #2c3e50; margin-bottom: 20px; }
         .divider { width: 80%; height: 2px; background: #eee; margin: 20px 0; border-style: dashed; }
         
-        /* 答案区域（默认隐藏） */
         .answer-area { display: none; width: 100%; }
         .answer-area.show { display: block; animation: fadeIn 0.4s; }
         .word-es { font-size: 32px; font-weight: bold; color: #2980b9; margin-bottom: 10px; }
         .note { font-size: 15px; color: #7f8c8d; line-height: 1.5; }
         .note.warning { color: #e74c3c; font-weight: bold; background: #fdf2f2; padding: 8px; border-radius: 8px; }
 
-        /* 按钮区 */
         .btn-show { 
             margin-top: 20px; padding: 10px 20px; background: #ecf0f1; color: #34495e; 
             border: none; border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s;
@@ -60,7 +54,6 @@
 <body>
 
     <div class="app-container">
-        <!-- 返回主页的链接 -->
         <a href="index.html" class="back-link">⬅️ 返回词汇对比表</a>
         
         <div class="progress" id="progress">1 / 13</div>
