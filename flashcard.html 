@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英西词汇记忆卡</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'HarmonyOS Sans SC', sans-serif; 
+            background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%); 
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+        }
+        .app-container { width: 100%; max-width: 400px; }
+        
+        /* 返回按钮 */
+        .back-link { 
+            display: block; text-align: center; margin-bottom: 15px; 
+            color: #2c3e50; text-decoration: none; font-weight: bold; 
+            background: rgba(255,255,255,0.7); padding: 8px; border-radius: 20px;
+        }
+
+        /* 顶部进度条 */
+        .progress { color: #2c3e50; font-size: 14px; text-align: center; margin-bottom: 15px; font-weight: bold; }
+
+        /* 卡片本体 */
+        .card { 
+            background: white; border-radius: 20px; padding: 30px 20px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15); text-align: center; 
+            min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; 
+        }
+        .word-en { font-size: 40px; font-weight: bold; color: #2c3e50; margin-bottom: 20px; }
+        .divider { width: 80%; height: 2px; background: #eee; margin: 20px 0; border-style: dashed; }
+        
+        /* 答案区域（默认隐藏） */
+        .answer-area { display: none; width: 100%; }
+        .answer-area.show { display: block; animation: fadeIn 0.4s; }
+        .word-es { font-size: 32px; font-weight: bold; color: #2980b9; margin-bottom: 10px; }
+        .note { font-size: 15px; color: #7f8c8d; line-height: 1.5; }
+        .note.warning { color: #e74c3c; font-weight: bold; background: #fdf2f2; padding: 8px; border-radius: 8px; }
+
+        /* 按钮区 */
+        .btn-show { 
+            margin-top: 20px; padding: 10px 20px; background: #ecf0f1; color: #34495e; 
+            border: none; border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .btn-show:active { background: #bdc3c7; }
+        
+        .controls { display: flex; justify-content: space-between; margin-top: 25px; gap: 15px; }
+        .controls button { 
+            flex: 1; padding: 15px; border: none; border-radius: 12px; 
+            font-size: 16px; font-weight: bold; color: white; background: #34495e; 
+            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.2s;
+        }
+        .controls button:active { transform: scale(0.95); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- 返回主页的链接 -->
+        <a href="index.html" class="back-link">⬅️ 返回词汇对比表</a>
+        
+        <div class="progress" id="progress">1 / 13</div>
+        
+        <div class="card">
+            <div class="word-en" id="enWord">Animal</div>
+            <div class="divider"></div>
+            
+            <div class="answer-area" id="answerArea">
+                <div class="word-es" id="esWord">Animal</div>
+                <div class="note" id="noteText">完全同源，意为“动物”。</div>
+            </div>
+
+            <button class="btn-show" id="showBtn" onclick="toggleAnswer()">显示答案</button>
+        </div>
+
+        <div class="controls">
+            <button onclick="prevCard()">上一张</button>
+            <button onclick="nextCard()">下一张</button>
+        </div>
+    </div>
+
+    <script>
+        const wordList = [
+            { en: "Animal", es: "Animal", note: "完全同源，意为“动物”。", warning: false },
+            { en: "Doctor", es: "Doctor", note: "完全同源，意为“医生”。", warning: false },
+            { en: "Important", es: "Importante", note: "英语以 -t 结尾，西语常以 -e 结尾。", warning: false },
+            { en: "Music", es: "Música", note: "同源，西语有重音符号。", warning: false },
+            { en: "Hotel", es: "Hotel", note: "完全同源，意为“酒店”。", warning: false },
+            { en: "Family", es: "Familia", note: "同源词，意为“家庭”。", warning: false },
+            { en: "History", es: "Historia", note: "同源词，意为“历史”。", warning: false },
+            { en: "Library", es: "Librería", note: "⚠️ 假朋友：英语是“图书馆”，西语是“书店”。", warning: true },
+            { en: "Exit", es: "Éxito", note: "⚠️ 假朋友：英语是“出口”，西语是“成功”。", warning: true },
+            { en: "Assist", es: "Asistir", note: "⚠️ 假朋友：英语是“协助”，西语是“出席/参加”。", warning: true },
+            { en: "Actual", es: "Actual", note: "⚠️ 假朋友：英语是“实际的”，西语是“当前的”。", warning: true },
+            { en: "Carpet", es: "Carpeta", note: "⚠️ 假朋友：英语是“地毯”，西语是“文件夹”。", warning: true },
+            { en: "Embarrassed", es: "Embarazada", note: "⚠️ 假朋友：英语是“尴尬”，西语是“怀孕”。", warning: true }
+        ];
+
+        let currentIndex = 0;
+        const enWord = document.getElementById('enWord');
+        const esWord = document.getElementById('esWord');
+        const noteText = document.getElementById('noteText');
+        const answerArea = document.getElementById('answerArea');
+        const showBtn = document.getElementById('showBtn');
+        const progress = document.getElementById('progress');
+
+        function updateCard() {
+            answerArea.classList.remove('show');
+            showBtn.innerText = "显示答案";
+            const data = wordList[currentIndex];
+            enWord.innerText = data.en;
+            esWord.innerText = data.es;
+            noteText.innerText = data.note;
+            if(data.warning) {
+                noteText.classList.add('warning');
+            } else {
+                noteText.classList.remove('warning');
+            }
+            progress.innerText = (currentIndex + 1) + " / " + wordList.length;
+        }
+
+        function toggleAnswer() {
+            if (answerArea.classList.contains('show')) {
+                answerArea.classList.remove('show');
+                showBtn.innerText = "显示答案";
+            } else {
+                answerArea.classList.add('show');
+                showBtn.innerText = "隐藏答案";
+            }
+        }
+
+        function prevCard() {
+            if (currentIndex > 0) currentIndex--;
+            else currentIndex = wordList.length - 1;
+            updateCard();
+        }
+
+        function nextCard() {
+            if (currentIndex < wordList.length - 1) currentIndex++;
+            else currentIndex = 0;
+            updateCard();
+        }
+
+        updateCard();
+    </script>
+</body>
+</html>
