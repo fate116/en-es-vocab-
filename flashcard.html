@@ -23,14 +23,18 @@
         .card { 
             background: white; border-radius: 20px; padding: 30px 20px; 
             box-shadow: 0 10px 20px rgba(0,0,0,0.15); text-align: center; 
-            min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            min-height: 280px; display: flex; flex-direction: column; justify-content: center; align-items: center; 
         }
-        .word-en { font-size: 40px; font-weight: bold; color: #2c3e50; margin-bottom: 20px; }
-        .divider { width: 80%; height: 2px; background: #eee; margin: 20px 0; border-style: dashed; }
+        .word-en { font-size: 38px; font-weight: bold; color: #2c3e50; margin-bottom: 5px; }
+        .phonetic-en { font-size: 16px; color: #7f8c8d; font-family: 'Times New Roman', Times, serif; margin-bottom: 15px; }
+        
+        .divider { width: 80%; height: 2px; background: #eee; margin: 15px 0; border-style: dashed; }
         
         .answer-area { display: none; width: 100%; }
         .answer-area.show { display: block; animation: fadeIn 0.4s; }
-        .word-es { font-size: 32px; font-weight: bold; color: #2980b9; margin-bottom: 10px; }
+        .word-es { font-size: 32px; font-weight: bold; color: #2980b9; margin-bottom: 5px; }
+        .phonetic-es { font-size: 16px; color: #3498db; font-family: 'Times New Roman', Times, serif; margin-bottom: 15px; }
+        
         .note { font-size: 15px; color: #7f8c8d; line-height: 1.5; }
         .note.warning { color: #e74c3c; font-weight: bold; background: #fdf2f2; padding: 8px; border-radius: 8px; }
 
@@ -56,14 +60,16 @@
     <div class="app-container">
         <a href="index.html" class="back-link">⬅️ 返回词汇对比表</a>
         
-        <div class="progress" id="progress">1 / 13</div>
+        <div class="progress" id="progress">1 / 50</div>
         
         <div class="card">
             <div class="word-en" id="enWord">Animal</div>
+            <div class="phonetic-en" id="enPhon">/ˈænɪml/</div>
             <div class="divider"></div>
             
             <div class="answer-area" id="answerArea">
                 <div class="word-es" id="esWord">Animal</div>
+                <div class="phonetic-es" id="esPhon">/aniˈmal/</div>
                 <div class="note" id="noteText">完全同源，意为“动物”。</div>
             </div>
 
@@ -77,25 +83,70 @@
     </div>
 
     <script>
+        // 🌟 词汇库已加入音标 (英音 / 西语拼读)
         const wordList = [
-            { en: "Animal", es: "Animal", note: "完全同源，意为“动物”。", warning: false },
-            { en: "Doctor", es: "Doctor", note: "完全同源，意为“医生”。", warning: false },
-            { en: "Important", es: "Importante", note: "英语以 -t 结尾，西语常以 -e 结尾。", warning: false },
-            { en: "Music", es: "Música", note: "同源，西语有重音符号。", warning: false },
-            { en: "Hotel", es: "Hotel", note: "完全同源，意为“酒店”。", warning: false },
-            { en: "Family", es: "Familia", note: "同源词，意为“家庭”。", warning: false },
-            { en: "History", es: "Historia", note: "同源词，意为“历史”。", warning: false },
-            { en: "Library", es: "Librería", note: "⚠️ 假朋友：英语是“图书馆”，西语是“书店”。", warning: true },
-            { en: "Exit", es: "Éxito", note: "⚠️ 假朋友：英语是“出口”，西语是“成功”。", warning: true },
-            { en: "Assist", es: "Asistir", note: "⚠️ 假朋友：英语是“协助”，西语是“出席/参加”。", warning: true },
-            { en: "Actual", es: "Actual", note: "⚠️ 假朋友：英语是“实际的”，西语是“当前的”。", warning: true },
-            { en: "Carpet", es: "Carpeta", note: "⚠️ 假朋友：英语是“地毯”，西语是“文件夹”。", warning: true },
-            { en: "Embarrassed", es: "Embarazada", note: "⚠️ 假朋友：英语是“尴尬”，西语是“怀孕”。", warning: true }
+            // --- 完全同源 / 基础词 ---
+            { en: "Animal", enPhon: "/ˈænɪml/", es: "Animal", esPhon: "/aniˈmal/", note: "完全同源，意为“动物”。", warning: false },
+            { en: "Doctor", enPhon: "/ˈdɒktə(r)/", es: "Doctor", esPhon: "/dokˈtoɾ/", note: "完全同源，意为“医生”。", warning: false },
+            { en: "Hotel", enPhon: "/həʊˈtel/", es: "Hotel", esPhon: "/oˈtel/", note: "完全同源，西语 h 不发音。", warning: false },
+            { en: "Radio", enPhon: "/ˈreɪdiəʊ/", es: "Radio", esPhon: "/ˈraðjo/", note: "完全同源，意为“收音机”。", warning: false },
+            { en: "Piano", enPhon: "/piˈænəʊ/", es: "Piano", esPhon: "/ˈpjano/", note: "完全同源，意为“钢琴”。", warning: false },
+            { en: "Taxi", enPhon: "/ˈtæksi/", es: "Taxi", esPhon: "/ˈtaksi/", note: "完全同源，意为“出租车”。", warning: false },
+            { en: "Color", enPhon: "/ˈkʌlə(r)/", es: "Color", esPhon: "/koˈloɾ/", note: "完全同源，意为“颜色”。", warning: false },
+            { en: "Hospital", enPhon: "/ˈhɒspɪtl/", es: "Hospital", esPhon: "/ospiˈtal/", note: "完全同源，意为“医院”。", warning: false },
+            { en: "Natural", enPhon: "/ˈnætʃrəl/", es: "Natural", esPhon: "/natuˈɾal/", note: "完全同源，意为“自然的”。", warning: false },
+            { en: "Chocolate", enPhon: "/ˈtʃɒklət/", es: "Chocolate", esPhon: "/tʃokoˈlate/", note: "完全同源，意为“巧克力”。", warning: false },
+            
+            // --- 规律变化词 ---
+            { en: "Important", enPhon: "/ɪmˈpɔːtnt/", es: "Importante", esPhon: "/impoɾˈtante/", note: "英语以 -t 结尾，西语加 -e。", warning: false },
+            { en: "Restaurant", enPhon: "/ˈrestrɒnt/", es: "Restaurante", esPhon: "/restauˈɾante/", note: "同源，西语末尾多一个 -e。", warning: false },
+            { en: "Music", enPhon: "/ˈmjuːzɪk/", es: "Música", esPhon: "/ˈmusika/", note: "同源，西语重音在第一个音节。", warning: false },
+            { en: "Menu", enPhon: "/ˈmenjuː/", es: "Menú", esPhon: "/meˈnu/", note: "同源，西语重音在 u 上。", warning: false },
+            { en: "Family", enPhon: "/ˈfæməli/", es: "Familia", esPhon: "/faˈmilja/", note: "同源词，意为“家庭”。", warning: false },
+            { en: "History", enPhon: "/ˈhɪstri/", es: "Historia", esPhon: "/isˈtoɾja/", note: "同源词，意为“历史”。", warning: false },
+            { en: "Problem", enPhon: "/ˈprɒbləm/", es: "Problema", esPhon: "/pɾoˈblema/", note: "同源，西语以 -a 结尾（但为阳性）。", warning: false },
+            { en: "System", enPhon: "/ˈsɪstəm/", es: "Sistema", esPhon: "/sisˈtema/", note: "同源词，意为“系统”。", warning: false },
+            { en: "Telephone", enPhon: "/ˈtelɪfəʊn/", es: "Teléfono", esPhon: "/teˈlefono/", note: "同源词，意为“电话”。", warning: false },
+            { en: "Elephant", enPhon: "/ˈelɪfənt/", es: "Elefante", esPhon: "/eleˈfante/", note: "同源词，意为“大象”。", warning: false },
+            { en: "Tiger", enPhon: "/ˈtaɪɡə(r)/", es: "Tigre", esPhon: "/ˈtiɣɾe/", note: "同源词，意为“老虎”。", warning: false },
+            { en: "Fruit", enPhon: "/fruːt/", es: "Fruta", esPhon: "/ˈfɾuta/", note: "同源词，意为“水果”。", warning: false },
+            { en: "Astronomy", enPhon: "/əˈstrɒnəmi/", es: "Astronomía", esPhon: "/astɾonoˈmia/", note: "后缀变化：-my 变为 -mía。", warning: false },
+            { en: "Biology", enPhon: "/baɪˈɒlədʒi/", es: "Biología", esPhon: "/bjoloˈxia/", note: "后缀变化：-gy 变为 -gía。", warning: false },
+            { en: "Nation", enPhon: "/ˈneɪʃn/", es: "Nación", esPhon: "/naˈsjon/", note: "后缀变化：-tion 变为 -ción。", warning: false },
+            { en: "Information", enPhon: "/ˌɪnfəˈmeɪʃn/", es: "Información", esPhon: "/infoɾmaˈsjon/", note: "后缀变化：-tion 变为 -ción。", warning: false },
+            { en: "Education", enPhon: "/ˌedʒuˈkeɪʃn/", es: "Educación", esPhon: "/eðukaˈsjon/", note: "后缀变化：-tion 变为 -ción。", warning: false },
+            { en: "Situation", enPhon: "/ˌsɪtʃuˈeɪʃn/", es: "Situación", esPhon: "/sitwaˈsjon/", note: "后缀变化：-tion 变为 -ción。", warning: false },
+            { en: "Action", enPhon: "/ˈækʃn/", es: "Acción", esPhon: "/akˈsjon/", note: "后缀变化：-tion 变为 -ción。", warning: false },
+            { en: "University", enPhon: "/ˌjuːnɪˈvɜːsəti/", es: "Universidad", esPhon: "/unibeɾsiˈðað/", note: "后缀变化：-ty 变为 -dad。", warning: false },
+            { en: "Society", enPhon: "/səˈsaɪəti/", es: "Sociedad", esPhon: "/soθjeˈðað/", note: "后缀变化：-ty 变为 -dad。", warning: false },
+            { en: "Reality", enPhon: "/riˈæləti/", es: "Realidad", esPhon: "/realiˈðað/", note: "后缀变化：-ty 变为 -dad。", warning: false },
+            { en: "Activity", enPhon: "/ækˈtɪvəti/", es: "Actividad", esPhon: "/aktiβiˈðað/", note: "后缀变化：-ty 变为 -dad。", warning: false },
+
+            // --- ⚠️ 假朋友 (False Friends) ---
+            { en: "Library", enPhon: "/ˈlaɪbrəri/", es: "Librería", esPhon: "/liβɾeˈɾia/", note: "⚠️ 假朋友：英语“图书馆”，西语“书店”。", warning: true },
+            { en: "Exit", enPhon: "/ˈeksɪt/", es: "Éxito", esPhon: "/ˈeksito/", note: "⚠️ 假朋友：英语“出口”，西语“成功”。", warning: true },
+            { en: "Assist", enPhon: "/əˈsɪst/", es: "Asistir", esPhon: "/asisˈtiɾ/", note: "⚠️ 假朋友：英语“协助”，西语“出席”。", warning: true },
+            { en: "Attend", enPhon: "/əˈtend/", es: "Atender", esPhon: "/atenˈdeɾ/", note: "⚠️ 假朋友：英语“出席”，西语“照顾”。", warning: true },
+            { en: "Actual", enPhon: "/ˈæktʃuəl/", es: "Actual", esPhon: "/akˈtwal/", note: "⚠️ 假朋友：英语“实际的”，西语“当前的”。", warning: true },
+            { en: "Realize", enPhon: "/ˈriːəlaɪz/", es: "Realizar", esPhon: "/realiˈθaɾ/", note: "⚠️ 假朋友：英语“意识到”，西语“执行”。", warning: true },
+            { en: "Carpet", enPhon: "/ˈkɑːpɪt/", es: "Carpeta", esPhon: "/kaɾˈpeta/", note: "⚠️ 假朋友：英语“地毯”，西语“文件夹”。", warning: true },
+            { en: "Soap", enPhon: "/səʊp/", es: "Sopa", esPhon: "/ˈsopa/", note: "⚠️ 假朋友：英语“肥皂”，西语“汤”。", warning: true },
+            { en: "Red", enPhon: "/red/", es: "Red", esPhon: "/reð/", note: "⚠️ 假朋友：英语“红色”，西语“网络”。", warning: true },
+            { en: "Pie", enPhon: "/paɪ/", es: "Pie", esPhon: "/pje/", note: "⚠️ 假朋友：英语“馅饼”，西语“脚”。", warning: true },
+            { en: "Embarrassed", enPhon: "/ɪmˈbærəst/", es: "Embarazada", esPhon: "/embaɾaˈθaða/", note: "⚠️ 假朋友：英语“尴尬”，西语“怀孕”。", warning: true },
+            { en: "Fabric", enPhon: "/ˈfæbrɪk/", es: "Fábrica", esPhon: "/ˈfabɾika/", note: "⚠️ 假朋友：英语“布料”，西语“工厂”。", warning: true },
+            { en: "Rope", enPhon: "/rəʊp/", es: "Ropa", esPhon: "/ˈropa/", note: "⚠️ 假朋友：英语“绳子”，西语“衣服”。", warning: true },
+            { en: "Sensible", enPhon: "/ˈsensəbl/", es: "Sensible", esPhon: "/senˈsible/", note: "⚠️ 假朋友：英语“明智的”，西语“敏感的”。", warning: true },
+            { en: "Introduce", enPhon: "/ˌɪntrəˈdjuːs/", es: "Introducir", esPhon: "/intɾoðuˈθiɾ/", note: "⚠️ 假朋友：英语“介绍”，西语“插入”。", warning: true },
+            { en: "Once", enPhon: "/wʌns/", es: "Once", esPhon: "/ˈonθe/", note: "⚠️ 假朋友：英语“一次”，西语“十一”。", warning: true },
+            { en: "Camp", enPhon: "/kæmp/", es: "Campo", esPhon: "/ˈkampo/", note: "⚠️ 假朋友：英语“营地”，西语“田野”。", warning: true }
         ];
 
         let currentIndex = 0;
         const enWord = document.getElementById('enWord');
+        const enPhon = document.getElementById('enPhon');
         const esWord = document.getElementById('esWord');
+        const esPhon = document.getElementById('esPhon');
         const noteText = document.getElementById('noteText');
         const answerArea = document.getElementById('answerArea');
         const showBtn = document.getElementById('showBtn');
@@ -105,9 +156,13 @@
             answerArea.classList.remove('show');
             showBtn.innerText = "显示答案";
             const data = wordList[currentIndex];
+            
             enWord.innerText = data.en;
+            enPhon.innerText = data.enPhon;
             esWord.innerText = data.es;
+            esPhon.innerText = data.esPhon;
             noteText.innerText = data.note;
+            
             if(data.warning) {
                 noteText.classList.add('warning');
             } else {
